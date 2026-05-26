@@ -65,6 +65,8 @@ function Banner({ vertical, label }) {
 
 /* ── Field ────────────────────────────────────────── */
 function Field({ label, value, onChange, step = 1000, min = 0, prefix, suffix }) {
+  const [localVal, setLocalVal] = useState(String(value));
+  useEffect(() => { setLocalVal(String(value)); }, [value]);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
       <label style={{
@@ -80,8 +82,12 @@ function Field({ label, value, onChange, step = 1000, min = 0, prefix, suffix })
           }}>{prefix}</span>
         )}
         <input
-          type="number" value={value} step={step} min={min}
-          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          type="number" value={localVal} step={step} min={min}
+          onChange={(e) => {
+            setLocalVal(e.target.value);
+            const parsed = parseFloat(e.target.value);
+            if (!isNaN(parsed)) onChange(parsed);
+          }}
           style={{
             width: "100%",
             padding: prefix ? "9px 10px 9px 26px" : suffix ? "9px 36px 9px 10px" : "9px 10px",
@@ -92,7 +98,10 @@ function Field({ label, value, onChange, step = 1000, min = 0, prefix, suffix })
             transition: "border-color 0.2s", minWidth: 0,
           }}
           onFocus={(e) => (e.target.style.borderColor = "#4a7cff")}
-          onBlur={(e) => (e.target.style.borderColor = "#1e2840")}
+          onBlur={(e) => {
+            if (isNaN(parseFloat(e.target.value))) setLocalVal(String(value));
+            e.target.style.borderColor = "#1e2840";
+          }}
         />
         {suffix && (
           <span style={{
@@ -250,7 +259,7 @@ export default function QuantoFica() {
 
   // Colunas da tabela — remove colunas em telas pequenas
   const colunas = isSmall
-    ? ["Prazo", "Parcela", "Total c/ Entrada"]
+    ? ["Prazo", "Parcela", "Tot. Financ.", "Tot. c/ Entr.", "Juros", "%"]
     : ["Prazo", "Parcela Mensal", "Total Financiado", "Total c/ Entrada", "Juros Totais", "%"];
   return (
     <div style={{
@@ -463,7 +472,7 @@ export default function QuantoFica() {
 
             {/* Tabela */}
             <div style={{ overflowX:"auto", borderRadius:10, border:"1px solid #111a2e" }}>
-              <table style={{ width:"100%", borderCollapse:"collapse", fontSize: isSmall ? "0.74rem" : "0.78rem", minWidth: isSmall ? "unset" : 480 }}>
+              <table style={{ width:"100%", borderCollapse:"collapse", fontSize: isSmall ? "0.66rem" : "0.78rem", minWidth: 480 }}>
                 <thead>
                   <tr style={{ background:"#0a0e1a" }}>
                     {colunas.map((h, i) => (
@@ -492,14 +501,14 @@ export default function QuantoFica() {
                           cursor:"pointer", transition:"all 0.15s",
                         }}
                       >
-                        <td style={{ padding: isSmall ? "8px 10px" : "9px 13px", color:"#e2e8ff", fontWeight:700, fontFamily:"'DM Mono',monospace", whiteSpace:"nowrap" }}>
+                        <td style={{ padding: isSmall ? "6px 7px" : "9px 13px", color:"#e2e8ff", fontWeight:700, fontFamily:"'DM Mono',monospace", whiteSpace:"nowrap" }}>
                           {d.n}m {sel && <span style={{ background:"#1a2e50", color:"#4a7cff", borderRadius:3, fontSize:"0.55rem", padding:"1px 5px" }}>✓</span>}
                         </td>
-                        <td style={{ padding: isSmall ? "8px 10px" : "9px 13px", textAlign:"right", color:"#60b8ff", fontWeight:700, fontFamily:"'DM Mono',monospace" }}>{fmt(d.parcela)}</td>
-                        {!isSmall && <td style={{ padding:"9px 13px", textAlign:"right", color:"#8899cc", fontFamily:"'DM Mono',monospace" }}>{fmt(d.totalFinanciado)}</td>}
-                        <td style={{ padding: isSmall ? "8px 10px" : "9px 13px", textAlign:"right", color:"#f0c840", fontWeight:600, fontFamily:"'DM Mono',monospace" }}>{fmt(d.totalPago)}</td>
-                        {!isSmall && <td style={{ padding:"9px 13px", textAlign:"right", color:"#ff6b6b", fontFamily:"'DM Mono',monospace" }}>{fmt(d.juros)}</td>}
-                        {!isSmall && <td style={{ padding:"9px 13px", textAlign:"right", color: pct>40?"#ff6b6b":"#ff9966", fontFamily:"'DM Mono',monospace" }}>{pct.toFixed(1)}%</td>}
+                        <td style={{ padding: isSmall ? "6px 7px" : "9px 13px", textAlign:"right", color:"#60b8ff", fontWeight:700, fontFamily:"'DM Mono',monospace" }}>{fmt(d.parcela)}</td>
+                        <td style={{ padding: isSmall ? "6px 7px" : "9px 13px", textAlign:"right", color:"#8899cc", fontFamily:"'DM Mono',monospace" }}>{fmt(d.totalFinanciado)}</td>
+                        <td style={{ padding: isSmall ? "6px 7px" : "9px 13px", textAlign:"right", color:"#f0c840", fontWeight:600, fontFamily:"'DM Mono',monospace" }}>{fmt(d.totalPago)}</td>
+                        <td style={{ padding: isSmall ? "6px 7px" : "9px 13px", textAlign:"right", color:"#ff6b6b", fontFamily:"'DM Mono',monospace" }}>{fmt(d.juros)}</td>
+                        <td style={{ padding: isSmall ? "6px 7px" : "9px 13px", textAlign:"right", color: pct>40?"#ff6b6b":"#ff9966", fontFamily:"'DM Mono',monospace" }}>{pct.toFixed(1)}%</td>
                       </tr>
                     );
                   })}
@@ -670,69 +679,68 @@ export default function QuantoFica() {
               </div>
             </div>
 
-            {/* ── COMPARATIVO: MOTORISTA DE APP ── */}
+            {/* ── COMPARATIVO: FINANCIAR vs ALUGAR 5 ANOS ── */}
             <div style={{
               background:"linear-gradient(135deg,#0d0f1a,#10122a)",
               border:"1.5px solid #2a2a50", borderRadius:12, padding:"18px 20px", marginBottom:14,
             }}>
               <div style={{ fontSize:"0.58rem", color:"#6060aa", fontFamily:"'DM Mono',monospace", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:14 }}>
-                🚖 Para o motorista de app — financiar vs alugar
+                🚖 Financiar vs Alugar — 5 anos de uso
               </div>
-              <div style={{ display:"grid", gridTemplateColumns: isSmall ? "1fr" : "repeat(3,1fr)", gap:12, marginBottom:14 }}>
-                {/* Custo mensal financiar */}
-                <div style={{ background:"#1a0a0a", border:"1px solid #3a1515", borderRadius:10, padding:"12px 14px" }}>
-                  <div style={{ fontSize:"0.55rem", color:"#7a3535", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", marginBottom:5 }}>FINANCIANDO</div>
-                  <div style={{ fontSize:"1rem", fontWeight:800, color:"#ff8888", fontFamily:"'DM Mono',monospace" }}>{fmt(custoMensalFinanciamento)}<span style={{ fontSize:"0.6rem", color:"#7a3535", fontWeight:400 }}>/mês</span></div>
-                  <div style={{ fontSize:"0.6rem", color:"#5a2a2a", marginTop:4, lineHeight:1.5 }}>parcela + IPVA + manutenção<br/>ao fim: carro vale {fmt(valorCarroFinal)}</div>
-                </div>
-                {/* Custo mensal alugar */}
-                <div style={{ background:"#0a0a1a", border:"1px solid #2a2a50", borderRadius:10, padding:"12px 14px" }}>
-                  <div style={{ fontSize:"0.55rem", color:"#6060aa", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", marginBottom:5 }}>ALUGANDO</div>
-                  <div style={{ fontSize:"1rem", fontWeight:800, color:"#a0a0ff", fontFamily:"'DM Mono',monospace" }}>{fmt(aluguelMensal)}<span style={{ fontSize:"0.6rem", color:"#6060aa", fontWeight:400 }}>/mês</span></div>
-                  <div style={{ fontSize:"0.6rem", color:"#3a3a6a", marginTop:4, lineHeight:1.5 }}>sem patrimônio ao final<br/>total gasto: {fmt(custoRealAluguel)}</div>
-                </div>
-                {/* Diferença */}
-                <div style={{
-                  background: economiaOuCustoExtra > 0 ? "#081a0c" : "#1a080a",
-                  border: `1px solid ${economiaOuCustoExtra > 0 ? "#153a1a" : "#3a1515"}`,
-                  borderRadius:10, padding:"12px 14px",
-                }}>
-                  <div style={{ fontSize:"0.55rem", color: economiaOuCustoExtra > 0 ? "#357a45" : "#7a3535", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", marginBottom:5 }}>
-                    {economiaOuCustoExtra > 0 ? "✅ ALUGUEL MAIS BARATO — SOBRA POR MÊS" : "✅ FINANCIAMENTO MAIS BARATO — SOBRA POR MÊS"}
+              <div style={{ display:"grid", gridTemplateColumns: isSmall ? "1fr" : "1fr 1fr", gap:12, marginBottom:14 }}>
+                {/* Total financiado */}
+                <div style={{ background:"#1a0a0a", border:"1px solid #3a1515", borderRadius:10, padding:"14px 16px" }}>
+                  <div style={{ fontSize:"0.55rem", color:"#7a3535", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", marginBottom:8 }}>🚗 TOTAL VALOR FINANCIADO ({prazoSelEfetivo} MESES)</div>
+                  <div style={{ fontSize:"1.3rem", fontWeight:800, color:"#ff8888", fontFamily:"'DM Mono',monospace" }}>{fmt(dadosSel.totalPago)}</div>
+                  <div style={{ fontSize:"0.6rem", color:"#5a2a2a", marginTop:6, lineHeight:1.6 }}>
+                    entrada {fmt(entradaEfetiva)} + parcelas {fmt(dadosSel.totalFinanciado)}<br/>
+                    ao fim: carro vale ~{fmt(valorCarroFinal)}
                   </div>
-                  <div style={{ fontSize:"1rem", fontWeight:800, color: economiaOuCustoExtra > 0 ? "#4ade80" : "#ff8888", fontFamily:"'DM Mono',monospace" }}>
-                    {fmt(Math.abs(economiaOuCustoExtra))}<span style={{ fontSize:"0.6rem", fontWeight:400, color:"#4a5880" }}>/mês</span>
+                </div>
+                {/* Total alugado 5 anos */}
+                <div style={{ background:"#0a0a1a", border:"1px solid #2a2a50", borderRadius:10, padding:"14px 16px" }}>
+                  <div style={{ fontSize:"0.55rem", color:"#6060aa", fontFamily:"'DM Mono',monospace", letterSpacing:"0.08em", marginBottom:8 }}>🏠 TOTAL VALOR ALUGADO (5 ANOS / 60 MESES)</div>
+                  <div style={{ fontSize:"1.3rem", fontWeight:800, color:"#a0a0ff", fontFamily:"'DM Mono',monospace" }}>{fmt(aluguelMensal * 60)}</div>
+                  <div style={{ fontSize:"0.6rem", color:"#3a3a6a", marginTop:6, lineHeight:1.6 }}>
+                    {fmt(aluguelMensal)}/mês × 60 meses<br/>
+                    sem patrimônio ao final
                   </div>
                 </div>
               </div>
-
-              {/* Veredicto */}
-              <div style={{
-                background: financiarVence ? "linear-gradient(135deg,#0a1a0e,#0d2010)" : "linear-gradient(135deg,#0a0a1a,#10102a)",
-                border: `1px solid ${financiarVence ? "#153a1a" : "#2a2a50"}`,
-                borderRadius:10, padding:"12px 16px",
-                display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10,
-              }}>
-                <div>
-                  <div style={{ fontSize:"0.6rem", color:"#4a5880", fontFamily:"'DM Mono',monospace", marginBottom:4 }}>
-                    PATRIMÔNIO LÍQUIDO AO FINAL DE {prazoSelEfetivo} MESES
+              {/* Diferença */}
+              {(() => {
+                const totalFinanc = dadosSel.totalPago;
+                const totalAlug = aluguelMensal * 60;
+                const diff = Math.abs(totalFinanc - totalAlug);
+                const aluguelMaisCaro = totalAlug > totalFinanc;
+                return (
+                  <div style={{
+                    background: aluguelMaisCaro ? "linear-gradient(135deg,#0a1a0e,#0d2010)" : "linear-gradient(135deg,#0a0a1a,#10102a)",
+                    border: `1px solid ${aluguelMaisCaro ? "#153a1a" : "#2a2a50"}`,
+                    borderRadius:10, padding:"12px 16px",
+                    display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10,
+                  }}>
+                    <div>
+                      <div style={{ fontSize:"0.6rem", color:"#4a5880", fontFamily:"'DM Mono',monospace", marginBottom:4 }}>
+                        DIFERENÇA TOTAL EM 5 ANOS DE USO
+                      </div>
+                      <div style={{ fontSize:"0.75rem", color: aluguelMaisCaro ? "#86efac" : "#a0a0ff", fontWeight:600 }}>
+                        {aluguelMaisCaro
+                          ? `Financiar custa ${fmt(diff)} menos que alugar por 5 anos — e você ainda fica com o carro`
+                          : `Alugar custa ${fmt(diff)} menos que financiar — mas sem patrimônio ao final`}
+                      </div>
+                    </div>
+                    <div style={{ textAlign:"right", flexShrink:0 }}>
+                      <div style={{ fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:800, color: aluguelMaisCaro ? "#4ade80" : "#a0a0ff", fontFamily:"'DM Mono',monospace" }}>
+                        {fmt(diff)}
+                      </div>
+                      <div style={{ fontSize:"0.58rem", color:"#4a5880", marginTop:2 }}>
+                        {aluguelMaisCaro ? "financiamento mais barato" : "aluguel mais barato"}
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontSize:"0.75rem", color: financiarVence ? "#86efac" : "#a0a0ff", fontWeight:600 }}>
-                    {financiarVence
-                      ? `Financiar deixa ${fmt(vantagemAluguel)} a mais em patrimônio (carro) vs alugar`
-                      : `Alugar e investir a sobra gera ${fmt(Math.abs(vantagemAluguel))} a mais que ter o carro depreciado`}
-                  </div>
-                  <div style={{ fontSize:"0.6rem", color:"#3a4a5a", marginTop:4 }}>
-                    Financiando: carro vale {fmt(patrimonioFinanciar)} · Alugando: {fmt(patrimonioAlugar)} em conta
-                  </div>
-                </div>
-                <div style={{ textAlign:"right", flexShrink:0 }}>
-                  <div style={{ fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:800, color: financiarVence ? "#4ade80" : "#a0a0ff", fontFamily:"'DM Mono',monospace" }}>
-                    {financiarVence ? "🚗 Financiar" : "🏠 Alugar"}
-                  </div>
-                  <div style={{ fontSize:"0.58rem", color:"#4a5880", marginTop:2 }}>vence neste cenário</div>
-                </div>
-              </div>
+                );
+              })()}
             </div>
 
             <div style={{ marginTop:14, padding:12, background:"#080c17", border:"1px solid #111a2e", borderRadius:8, fontSize:"0.62rem", color:"#3d4a6a", lineHeight:1.7, fontFamily:"'DM Mono',monospace" }}>
