@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.simuladorquantofica.com.br" }],
+      "destination": "https://simuladorquantofica.com.br/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/move-brasil", "destination": "/movebrasil-blog" },
     { "source": "/simulador", "destination": "/quantofica" },
