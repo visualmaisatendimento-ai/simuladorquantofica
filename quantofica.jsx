@@ -512,6 +512,32 @@ export default function QuantoFica() {
             </p>
           </section>
 
+
+          {/* CTA FINANCIAMENTO */}
+          <section style={{ background:"linear-gradient(135deg,#0f1d3a 0%,#1a2d50 50%,#0d1b35 100%)", border:"1px solid #1e3a6e", borderRadius:16, padding:"24px 28px", marginTop:8, position:"relative", overflow:"hidden" }}>
+            <div style={{ position:"absolute", top:-20, right:-20, width:120, height:120, background:"radial-gradient(circle,rgba(59,130,246,0.15) 0%,transparent 70%)", pointerEvents:"none" }} />
+            <div style={{ display:"flex", alignItems:"flex-start", gap:12, marginBottom:16 }}>
+              <span style={{ fontSize:"1.6rem" }}>&#x1F697;</span>
+              <div>
+                <p style={{ color:"#93c5fd", fontSize:"0.65rem", fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:4 }}>Próximo passo</p>
+                <h3 style={{ color:"#fff", fontSize:"1.1rem", fontWeight:700, margin:0 }}>Pronto para financiar?</h3>
+              </div>
+            </div>
+            <div style={{ background:"rgba(251,191,36,0.1)", border:"1px solid rgba(251,191,36,0.3)", borderRadius:8, padding:"8px 12px", marginBottom:16, display:"flex", alignItems:"center", gap:8 }}>
+              <span>&#x23F3;</span>
+              <p style={{ color:"#fbbf24", fontSize:"0.75rem", fontFamily:"'DM Mono',monospace", margin:0 }}>Inscricoes Move Brasil abrem em <strong>19 de junho de 2026</strong></p>
+            </div>
+            <p style={{ color:"#94a3b8", fontSize:"0.82rem", lineHeight:1.5, marginBottom:20 }}>Use os valores desta simulacao para se inscrever no programa oficial. Taxas subsidiadas de ate <strong style={{ color:"#4ade80" }}>1,09% a.m.</strong> para motoristas de app e taxistas.</p>
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              <a href={"https://www.gov.br/mdic/pt-br/assuntos/sdic/move-brasil?utm_source=simuladorquantofica&utm_medium=cta_simulacao&utm_campaign=move_brasil_2026"} target="_blank" rel="noopener noreferrer" style={{ display:"block", background:"linear-gradient(135deg,#2563eb,#1d4ed8)", color:"#fff", textDecoration:"none", textAlign:"center", padding:"14px 20px", borderRadius:10, fontFamily:"'DM Mono',monospace", fontSize:"0.82rem", fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase", border:"1px solid #3b82f6" }}>
+                Acessar Move Brasil oficial
+              </a>
+              <a href={"https://www.bv.com.br/financiamento/financiamento-de-veiculos?utm_source=simuladorquantofica&utm_medium=cta_simulacao&utm_campaign=bv_auto_2026"} target="_blank" rel="noopener noreferrer" style={{ display:"block", background:"transparent", color:"#93c5fd", textDecoration:"none", textAlign:"center", padding:"12px 20px", borderRadius:10, fontFamily:"'DM Mono',monospace", fontSize:"0.78rem", fontWeight:600, border:"1px solid #1e3a6e" }}>
+                Simular tambem no BV Banco
+              </a>
+            </div>
+          </section>
+
           {/* BANNER MEIO */}
           <AdUnit slot="6038065393" />
 
