@@ -38,17 +38,24 @@ function AdUnit({ slot, vertical }) {
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
   }, []);
   return (
-    <ins
-      className="adsbygoogle"
-      style={{ display: "block", minHeight: vertical ? 300 : 72, width: "100%" }}
-      data-ad-client="ca-pub-9764377464253220"
-      data-ad-slot={slot}
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-    />
+    <div style={{
+      width: "100%",
+      minHeight: vertical ? 300 : 72,
+      overflow: "hidden",
+      flexShrink: 0,
+      display: "block",
+    }}>
+      <ins
+        className="adsbygoogle"
+        style={{ display: "block", width: "100%", height: vertical ? 300 : 72 }}
+        data-ad-client="ca-pub-9764377464253220"
+        data-ad-slot={slot}
+        data-ad-format={vertical ? "vertical" : "horizontal"}
+        data-full-width-responsive="false"
+      />
+    </div>
   );
 }
-
 function Field({ label, value, onChange, step = 1000, min = 0, prefix, suffix }) {
   const [localVal, setLocalVal] = useState(String(value));
   useEffect(() => { setLocalVal(String(value)); }, [value]);
