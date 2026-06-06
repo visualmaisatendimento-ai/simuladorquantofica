@@ -33,37 +33,22 @@ function useWidth() {
 }
 
 /* ── Banner ───────────────────────────────────────── */
-function Banner({ vertical, label }) {
+function AdUnit({ slot, vertical }) {
+  useEffect(() => {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+  }, []);
   return (
-    <div style={{
-      background: "linear-gradient(135deg,#1a1f2e 60%,#1e2840)",
-      border: "1.5px dashed #2d3550",
-      borderRadius: 12,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 8,
-      color: "#3d4a6a",
-      fontFamily: "'DM Mono', monospace",
-      fontSize: "0.68rem",
-      letterSpacing: "0.08em",
-      textTransform: "uppercase",
-      width: vertical ? "100%" : "100%",
-      minHeight: vertical ? 300 : 72,
-      userSelect: "none",
-      flexShrink: 0,
-    }}>
-      <span style={{ fontSize: "1.2rem" }}>📢</span>
-      <span>{label || "BANNER ADS"}</span>
-      <span style={{ fontSize: "0.55rem", opacity: 0.5 }}>
-        {vertical ? "160 × 600" : "728 × 90"}
-      </span>
-    </div>
+    <ins
+      className="adsbygoogle"
+      style={{ display: "block", minHeight: vertical ? 300 : 72, width: "100%" }}
+      data-ad-client="ca-pub-9764377464253220"
+      data-ad-slot={slot}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    />
   );
 }
 
-/* ── Field ────────────────────────────────────────── */
 function Field({ label, value, onChange, step = 1000, min = 0, prefix, suffix }) {
   const [localVal, setLocalVal] = useState(String(value));
   useEffect(() => { setLocalVal(String(value)); }, [value]);
@@ -346,7 +331,7 @@ export default function QuantoFica() {
 
       {/* ── BANNER TOPO ── */}
       <div style={{ padding:"12px 16px 0" }}>
-        <Banner label="Banner Topo — 728×90" />
+        <AdUnit slot="6038065393" />
       </div>
 
       {/* ── HERO ── */}
@@ -406,7 +391,7 @@ export default function QuantoFica() {
       }}>
 
         {/* Banner lateral esquerdo — só em telas grandes */}
-        {!isMid && <Banner vertical label="Banner 160×600" />}
+        {!isMid && <AdUnit slot="4724983721" vertical />}
 
         {/* ── CONTEÚDO CENTRAL ── */}
         <div style={{ display:"flex", flexDirection:"column", gap:20, minWidth:0 }}>
@@ -521,7 +506,7 @@ export default function QuantoFica() {
           </section>
 
           {/* BANNER MEIO */}
-          <Banner label="Banner Meio — 728×90" />
+          <AdUnit slot="6038065393" />
 
           {/* SEÇÃO CDI */}
           <section className="fade-up" style={{
@@ -749,11 +734,11 @@ export default function QuantoFica() {
           </section>
 
           {/* BANNER RODAPÉ */}
-          <Banner label="Banner Rodapé — 728×90" />
+          <AdUnit slot="6038065393" />
         </div>
 
         {/* Banner lateral direito — só em telas grandes */}
-        {!isMid && <Banner vertical label="Banner 160×600" />}
+        {!isMid && <AdUnit slot="4724983721" vertical />}
       </div>
 
       {/* FOOTER */}
